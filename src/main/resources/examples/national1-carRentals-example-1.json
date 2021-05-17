@@ -1,0 +1,23 @@
+ {
+ "Rentals":[
+	  {
+		  "origin": "OHare",
+		  "destination": "Midway",
+		  "rentDate": "Mar 24, 2021",
+		  "price": 50,
+		  "totalSeats": 5,
+		  "brand": "Nissan Sentra",
+		  "company": "National"
+	  },
+		{
+		  "origin": "OHare",
+		  "destination": "Midway",
+		  "rentDate": "Mar 24, 2021",
+		  "price": 70,
+		  "totalSeats": 7,
+		  "brand": "Honda Odyssey",
+		  "company": "National"
+	  }
+  ]
+ }
+  

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:hertz-car-rental-api="http://www.mulesoft.org/schema/mule/hertz-car-rental-api"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/hertz-car-rental-api http://www.mulesoft.org/schema/mule/hertz-car-rental-api/current/mule-hertz-car-rental-api.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="a638d10d-2a11-46d6-940c-95796d9765d8" file="config.yaml"/>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b4717054-b3e5-4681-acd0-1547dad17b6d" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<hertz-car-rental-api:config name="Hertz_Car_Rental_API_Config" doc:name="Hertz Car Rental API Config" doc:id="bf060eef-912e-4405-9de7-a9a560da5271" property_host="${hertz.host}" property_port="${hertz.port}" property_protocol="${hertz.protocal}" property_basePath="${hertz.basePath}" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="e8435fa3-f9d3-474b-bb58-fb9fd95fe1e8">
+		<http:request-connection host="${training2021.host}" port="${training2021.port}" />
+	</http:request-config>
+	<configuration doc:name="Configuration" doc:id="b6bc7d88-c3e4-4686-a5df-3fe544d27cd5" defaultErrorHandler-ref="globalError_Handler" />
+	<error-handler name="globalError_Handler" doc:id="1b1a0e5b-e677-49bd-9b14-a1c23f8f14d6" >
+		
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d5c1fc30-3297-4e41-82f6-43b38cb72d45" type="APP:INVALID_DROPOFF, VALIDATION:INVALID_BOOLEAN">
+				<ee:transform doc:name="error.description" doc:id="c109eb36-48fd-419f-8ca8-6533707ab189">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.description as String
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="400" doc:name="httpStatus" doc:id="012f5171-12a0-4401-978f-63c41f11dbb6" variableName="httpStatus" />
+			</on-error-continue>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d00037dd-61fe-4c62-b52c-d9a9901e7e93" type="ANY">
+			<ee:transform doc:name="error.description" doc:id="093f9d33-38d1-4b15-8f59-78f218089678">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

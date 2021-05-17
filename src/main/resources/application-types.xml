@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="carRentals_json" format="json">
+      <types:shape format="weave" example="examples/carRentals-example-1.json"><![CDATA[%dw 2.0
+
+type carRentals_json = Array<{|  origin: String,   destination: String,   rentDate: String,   price: Number {"typeId": "int"},   carTotalSeats: Number {"typeId": "int"},   carBrand: String,   company: String|}> {"example": "[{\\\"origin\\\":\\\"OHare\\\",\\\"destination\\\":\\\"Midway\\\",\\\"rentDate\\\":\\\"2021-03-24\\\",\\\"price\\\":50,\\\"carTotalSeats\\\":5,\\\"carBrand\\\":\\\"Nissan Sentra\\\",\\\"company\\\":\\\"National\\\"},{\\\"origin\\\":\\\"OHare\\\",\\\"destination\\\":\\\"Midway\\\",\\\"rentDate\\\":\\\"2021-03-24\\\",\\\"price\\\":70,\\\"carTotalSeats\\\":7,\\\"carBrand\\\":\\\"Honda Odyssey\\\",\\\"company\\\":\\\"National\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="carRental_json" format="json">
+      <types:shape format="weave" example="examples/carRental-example-1.json"><![CDATA[%dw 2.0
+
+type carRental_json = {|
+  origin: String, 
+  destination: String, 
+  rentDate: String, 
+  price: Number {"typeId": "int"}, 
+  carTotalSeats: Number {"typeId": "int"}, 
+  carBrand: String, 
+  company: String
+|} {"example": "{\\\"origin\\\":\\\"OHare\\\",\\\"destination\\\":\\\"Midway\\\",\\\"rentDate\\\":\\\"2021-03-24\\\",\\\"price\\\":50,\\\"carTotalSeats\\\":5,\\\"carBrand\\\":\\\"Nissan Sentra\\\",\\\"company\\\":\\\"National\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="carRentals_xml" format="xml">
+      <types:example format="xml" element="{http://soap.training.conflowence.com/}listAllRentalsResponse" location="examples/carRentals-example-1.xml"/>
+    </types:type>
+    <types:type name="CarRental_pojo" format="java">
+      <types:shape format="java" element="com.conflowence.training.CarRental"/>
+    </types:type>
+    <types:type name="national_carRentals_json" format="json">
+      <types:shape format="weave" example="examples/national1-carRentals-example-2.json"><![CDATA[%dw 2.0
+
+type national_carRentals_json = {|
+  Rentals: Array<{|    origin: String,     destination: String,     rentDate: String,     price: Number {"typeId": "int"},     totalSeats: Number {"typeId": "int"},     brand: String,     company: String  |}>
+|} {"example": "{\\\"Rentals\\\":[{\\\"origin\\\":\\\"OHare\\\",\\\"destination\\\":\\\"Midway\\\",\\\"rentDate\\\":\\\"Mar 24, 2021\\\",\\\"price\\\":50,\\\"totalSeats\\\":5,\\\"brand\\\":\\\"Nissan Sentra\\\",\\\"company\\\":\\\"National\\\"},{\\\"origin\\\":\\\"OHare\\\",\\\"destination\\\":\\\"Midway\\\",\\\"rentDate\\\":\\\"Mar 24, 2021\\\",\\\"price\\\":70,\\\"totalSeats\\\":7,\\\"brand\\\":\\\"Honda Odyssey\\\",\\\"company\\\":\\\"National\\\"}]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#da2f3d2a-24a6-4c7b-80cd-1775a98392b1">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="CarRental_pojo[]"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#aa2fd4f5-f348-4464-a000-6f5642e501c1">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="national_carRentals_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#fb8371ef-04b1-4f9b-943a-456596fef8d3">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="national_carRentals_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#5a4c3ad4-0d68-4709-a97a-36b19419dc98">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="carRental_json"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b1673d6c-9234-4dc8-a58d-955d137770c1">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="carRentals_xml"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

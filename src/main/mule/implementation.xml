@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:hertz-car-rental-api="http://www.mulesoft.org/schema/mule/hertz-car-rental-api"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/hertz-car-rental-api http://www.mulesoft.org/schema/mule/hertz-car-rental-api/current/mule-hertz-car-rental-api.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<flow name="getCarRentals" doc:id="da6a231b-0200-4cbf-bc18-39b1ae169abc" >
+		<set-variable value="#[message.attributes.queryParams.company]" doc:name="company" doc:id="dc4b8462-6caa-49a6-be46-260d20fd8887" variableName="company"/>
+		<flow-ref doc:name="setDropoff" doc:id="83a0b797-0964-495c-a991-c01e73eaa516" name="setDropoff"/>
+		<validation:is-true doc:name="is dropoff valid" doc:id="bac0b525-56be-4576-a521-e030f09e431d" expression="#[['OHare', 'Midway',  'Mitchell', 'Mitchell Milwaukee' , 'Chicago', 'Berkeley', 'Elmhurst'] contains vars.dropoff]" message="#['invalid dropoff' ++ ' ' ++ (vars.dropoff default ' ')]">
+			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="APP:INVALID_DROPOFF" />
+		</validation:is-true>
+		<choice doc:name="Choice" doc:id="7c1e5452-85d0-4b74-afbf-0f485e7401d1" >
+			<when expression='#[vars.company == "Hertz"]'>
+				<flow-ref doc:name="getHertzCarRental" doc:id="e6a6bf3c-6d14-4ed5-9ee8-980d757cce2e" name="getHertzCarRental"/>
+			</when>
+			<when expression='#[vars.company == "National"]'>
+				<flow-ref doc:name="getNationalCarRentals" doc:id="e468ca55-8ee2-42e8-bfe2-9cd1953196c8" name="getNationalCarRentals"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="getAllCarRentals" doc:id="627f5b88-60e4-4f5d-9008-e75bf48dc576" name="getAllCarRentals"/>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="[car rental] to JSON" doc:id="7173f39f-55e6-44c9-b7d1-d7da599ec6d9">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7051ff48-b0ed-469c-901a-f4548a7fe7d2" />
+		
+	</flow>
+	<flow name="getAllCarRentals" doc:id="bb2bdfc7-5139-433a-abd9-c5c14bc327b3" >
+		<scatter-gather doc:name="Scatter-Gather" doc:id="45e7a7e7-6d38-4432-a275-024133d5a4f0" >
+			<route >
+				<try doc:name="Try" doc:id="ec72b760-e995-460b-a1af-1b9b466133ac" >
+					<flow-ref doc:name="getHertzCarRental" doc:id="2535d20c-8712-4314-a33f-c9f694747829" name="getHertzCarRental" />
+					
+				</try>
+			</route>
+			<route >
+				<try doc:name="Try" doc:id="1a74f241-c207-4920-bc14-b7a7842984ef" >
+					<flow-ref doc:name="getNationalCarRentals" doc:id="9bec0507-2653-4be6-ad40-177aafc26a64" name="getNationalCarRentals" />
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="Error Continue" doc:id="4e72de48-2ec6-4143-8ce7-4afd8e0c7299" type="ANY" >
+							<ee:transform doc:name="[]" doc:id="d57d28ac-a3aa-4617-907b-1558c709594f" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="flatten to [carRental]" doc:id="3239d50c-9d20-4581-b525-47f8e80f53d8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+flatten(payload..payload)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5343887d-4a0c-4d82-9ec8-39f24e79f7ba" />
+	</flow>
+	<sub-flow name="setDropoff" doc:id="8374062d-be79-4630-af27-e71ba2ed3521" >
+		<set-variable value="#[message.attributes.queryParams.dropoff]" doc:name="setDropoff" doc:id="3ab33d6a-fc2b-470c-88ed-cdb2e07c4d76" variableName="dropoff" />
+	</sub-flow>
+	<flow name="getHertzCarRental" doc:id="0bbce70c-c114-428c-a3a9-2c2dbecc0bea" >
+		<hertz-car-rental-api:get-rentals doc:name="Get rentals" doc:id="bd8ff52c-f2f6-4563-8b53-5445f7fd443c" config-ref="Hertz_Car_Rental_API_Config" client-id="${hertz.client_id}" client-secret="${hertz.client_secret}" dropoff-location="#[vars.dropoff]" pickup-location="OHare"/>
+		<ee:transform doc:name="JSON to [CarRental]" doc:id="da2f3d2a-24a6-4c7b-80cd-1775a98392b1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	carBrand: payload01.car.brand,
+	carTotalSeats: payload01.car.totalSeats,
+	company: "Hertz",
+	dropoffLocation: payload01.dropoffLocation,
+	pickupLocation: payload01.pickupLocation,
+	price: payload01.price,
+	rentDate: payload01.rentDate
+} as Object {
+	class : "com.conflowence.training.CarRental"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5e5f62b9-c82e-463f-b816-2f9b908a778c" message="#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9844261d-c5ff-4588-95fd-a18bf9af5186" type="HERTZ-CAR-RENTAL-API:BAD_REQUEST">
+				<ee:transform doc:name="No Car Rentals" doc:id="0eb542d9-a48a-47e9-bb5f-b4344b2f54c2">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "No Car Rentals to " ++ vars.dropoff as String 
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="200" doc:name="httpStatus" doc:id="04793eb6-9ef4-4883-a4a1-4cfe117b62c7" variableName="httpStatus" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="getNationalCarRentals" doc:id="40f9bd22-d37e-4299-ad08-3d16581f7896" >
+		<http:request method="GET" doc:name="Get Rentals" doc:id="fb8371ef-04b1-4f9b-943a-456596fef8d3" config-ref="HTTP_Request_configuration" path="/national/rentals/{dropoff}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"dropoff" : vars.dropoff
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="JSON to [CarRental]" doc:id="aa2fd4f5-f348-4464-a000-6f5642e501c1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+Rentals: payload.rentals map ( rental , indexOfRental ) ->
+{
+	origin: rental.pickup,
+	destination: rental.dropoff,
+	rentDate: rental.rentDate,
+	price: rental.price,
+	totalSeats: rental.totalSeats,
+	brand: rental.brand,
+	company: rental.company
+} as Object {
+	class : "com.conflowence.training.CarRental"
+} 
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="51ed8d33-370c-46a5-90a5-00d0d4d05977" message="#[payload]"/>
+	</flow>
+	<flow name="postRental" doc:id="4e7581cf-71ac-4419-95ef-a61b36fa92ab" >
+		<ee:transform doc:name="Transform Message" doc:id="5a4c3ad4-0d68-4709-a97a-36b19419dc98" >
+			<ee:message >
+				<ee:set-payload resource="json_carRental_Playground.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="DWoutput" ><![CDATA[%dw 2.0
+output application/xml
+---
+data: {
+	hub: "ABC",
+	rental
+	@(company: payload.company):{
+		dropoff:payload.dropoff
+	}	
+	
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bd6d781e-ef2d-4515-b869-c1d6605deb15" message="#[vars.DWoutput]"/>
+	</flow>
+	<flow name="postMutipleRentals" doc:id="333690c6-6b90-441d-9962-eb18b950aee6" >
+		<http:listener doc:name="Post /mutiplerentals" doc:id="ce6d442e-ef5a-47a0-988a-487e2d41afec" config-ref="HTTP_Listener_config" path="/mutiplerentals" allowedMethods="POST"/>
+		<ee:transform doc:name="Transform Message" doc:id="b1673d6c-9234-4dc8-a58d-955d137770c1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+import dasherize from dw::core::Strings
+//var numSeats = (x=5)->x
+/*var numSeats = (carBrand:String) ->
+if(["Nissan Sentra", "Toyato Corolla"] contains carBrand) 
+	5
+else
+	7*/
+type Currency = String {format: "###.00"}
+type CarRental = Object {class: "com.conflowence.training.CarRental"}
+
+fun getNumSeats(carBrand: String) = do{
+	var maxSeats = 
+	if(["Nissan Sentra", "Toyato Corolla"] contains carBrand) 
+		5
+	else
+		7
+	---
+	maxSeats
+}---
+rentals:(payload..*return map(object, index)->{
+	dropoffLocation: object.dropoff replace/(Elmhurst)/with "Elhurst",
+	price: object.price as Number as Currency as Number,	
+	carBrand: dasherize(object.carBrand),
+	carTotalSeats:lookup("getTotalSeats",{carBrand:object.carBrand}),
+//	carTotalSeats: getNumSeats(object.carBrand as String),
+//	date:object.rentDate as Date {format:"yyyy/MM/dd"},
+	rentDate: object.rentDate as Date{format:"yyyy/MM/dd"} as String {format: "MMM dd, yyyy"},
+	availableSeats: object.emptySeats 
+} as Object)distinctBy $ filter($.availableSeats != Null) 
+	orderBy $.rentDate orderBy $.price]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3be19184-e671-4b0f-b9db-30efb718d6c1" />
+	</flow>
+	<flow name="getTotalSeats" doc:id="774f0030-d5f2-44bf-806a-88edee4ea747" >
+		<ee:transform doc:name="Transform Message" doc:id="7bf0aa01-dfd8-4f8b-8ba6-d967318b7e12" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+
+fun getNumSeats(carBrand: String) = do{
+	var maxSeats = 
+	if(["Nissan Sentra", "Toyato Corolla"] contains carBrand) 
+		5
+	else
+		7
+	---
+	maxSeats
+}
+---
+getNumSeats(payload.carBrand)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

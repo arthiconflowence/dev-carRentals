@@ -1,0 +1,57 @@
+#%RAML 1.0
+title: ABC Car Rental API
+version: 1.0
+
+types:
+  CarRental: !include datatypes/CarRental.raml
+
+/rentals:
+  get:
+    displayName: Get car rentals
+    queryParameters:
+      orign:
+        required: true
+        enum:
+          - OHare
+          - Midway
+          - Mitchell Milwaukee
+          - Chicago
+          - Elmhurst
+          - Berkeley
+      destination:
+        required: true
+        enum:
+          - OHare
+          - Midway
+          - Mitchell Milwaukee
+          - Chicago
+          - Elmhurst
+          - Berkeley
+      carTotalSeats:
+        required: false
+      company:
+        required: false
+        enum:
+          - Hertz
+          - National
+          - Alamo
+
+    responses:
+      200:
+        body:
+          application/json:
+            type: CarRental[]
+            examples:
+              output: !include /examples/CarRentalsExample.raml
+  post:
+    body:
+      application/json:
+        type: CarRental
+        examples:
+          input: !include examples/CarRentalNoIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+              message: Car rental added

@@ -1,0 +1,16 @@
+http:
+  port: "8081"
+
+hertz:
+  host: "training4-hertz-api-karunkanshanmugam.us-e2.cloudhub.io"
+  port: "80"
+  protocal: "HTTP"
+  basePath: "/"
+  client_id: "4f945178e8f84cd1b1323e227aa10352"
+  client_secret: "B6106897b9024Cbc9d265A921b912DDB"
+
+training2021: 
+  host: "national-car-rental-ws.us-e2.cloudhub.io"
+  port: "80"
+  basepath: "/"
+  protocol: "HTTP"

@@ -1,0 +1,50 @@
+<ns2:listAllRentalsResponse xmlns:ns2="http://soap.training.conflowence.com/">
+    <return companyName="National">
+      <rentDate>2021/04/05</rentDate>
+        <dropoff>Midway</dropoff><carSeats>5</carSeats>
+        <pickup>OHare</pickup>
+        <carBrand>Nissan Sentra</carBrand>
+        <price>60</price>
+    </return>
+    <return companyName="Alamo">
+        <rentDate>2021/04/06</rentDate><dropoff>OHare</dropoff><carSeats>7</carSeats>
+        <pickup>Midway</pickup>
+        <carBrand>Volvo XC90</carBrand>
+        <price>100</price>
+    </return>
+      <return companyName="Alamo">
+        <rentDate>2021/04/06</rentDate><dropoff>OHare</dropoff><carSeats>7</carSeats>
+        <pickup>Midway</pickup>
+        <carBrand>Volvo XC90</carBrand>
+        <price>100</price>
+    </return>
+      <return companyName="Alamo">
+        <rentDate>2021/05/06</rentDate><dropoff>OHare</dropoff><carSeats>7</carSeats>
+        <pickup>Midway</pickup>
+        <carBrand>Volvo XC90</carBrand>
+        <price>100</price>
+    </return>
+    <return companyName="Alamo">
+        <rentDate>2021/04/06</rentDate><dropoff>OHare</dropoff>
+        <carSeats>5</carSeats>
+        <pickup>Mitchell Milwauke</pickup>
+        <carBrand>Toyota Corolla</carBrand>
+        <price>80</price>
+    </return>
+    <return companyName="Alamo">
+        <rentDate>2021/05/01</rentDate>
+        <dropoff>Mitchell Milwauke</dropoff><carSeats>7</carSeats>
+        <pickup>Midway</pickup>
+        <carBrand>Honda Odyssey</carBrand>
+        <price>120</price>
+    </return>
+    <return companyName="Alamo">
+        <rentDate>2021/06/05</rentDate>
+        <dropoff>Elmhurst</dropoff><carSeats>5</carSeats>
+        <pickup>Chicago</pickup>
+        <carBrand>Nissan Sentra</carBrand>
+        <price>45</price>
+    </return>
+</ns2:listAllRentalsResponse>
+
+  
