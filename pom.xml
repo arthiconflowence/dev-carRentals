@@ -29,7 +29,24 @@
 				<artifactId>mule-maven-plugin</artifactId>
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
-				<configuration/>
+				<configuration>
+					<!--<standaloneDeployment>
+					      <muleHome>"PUT YOUR STANDALONE HOME PATH HERE"</muleHome>
+					      <muleVersion>"PUT YOUR MULE VERSION HERE"</muleVersion>
+				     </standaloneDeployment> -->
+					<cloudHubDeployment>
+						<objectStoreV2>true</objectStoreV2>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<muleVersion>4.3.0</muleVersion>
+						<username>arthiatsr</username>
+						<password>Iskavsda@01</password>
+						<applicationName>dev-carrentals-ws</applicationName>
+						<environment>Sandbox</environment>
+						<businessGroup>Conflowence</businessGroup>
+						<region>us-east-2</region>
+					</cloudHubDeployment>
+					<classifier>mule-application</classifier>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
